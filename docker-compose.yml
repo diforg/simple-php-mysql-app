@@ -1,0 +1,44 @@
+version: "3.1"
+networks:
+    api:
+        driver: bridge
+volumes:
+    database:
+        driver: local
+services:
+    nginx:
+        image: nginx:alpine
+        container_name: api-nginx
+        restart: unless-stopped
+        tty: true
+        working_dir: /application
+        volumes:
+            - ./src:/application
+            - ./docker/nginx.conf:/etc/nginx/conf.d
+        ports:
+            - "8080:80"
+        networks:
+            - api
+    webserver:
+        image: diforg/ws-php8.1:1.0.4
+        container_name: ws-php8.1
+        restart: unless-stopped
+        tty: true
+        working_dir: /application
+        volumes:
+          - ./src:/application
+        networks:
+          - api
+    mariadb:
+        image: mariadb
+        restart: always
+        container_name: db-maria
+        environment:
+            MARIADB_ROOT_PASSWORD: supersenha
+        volumes:
+            - ./data:/mariadb/data
+        ports:
+            - "33066:3306"
+
+
+
