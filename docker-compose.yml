@@ -17,6 +17,8 @@ services:
             - ./docker/nginx.conf:/etc/nginx/conf.d
         ports:
             - "8080:80"
+        links:
+            - mysql            
         networks:
             - api
     webserver:
@@ -29,16 +31,21 @@ services:
           - ./src:/application
         networks:
           - api
-    mariadb:
-        image: mariadb
+    mysql:
+        image: mysql:5.7
+        container_name: db-mysql
         restart: always
-        container_name: db-maria
-        environment:
-            MARIADB_ROOT_PASSWORD: supersenha
-        volumes:
-            - ./data:/mariadb/data
         ports:
-            - "33066:3306"
-
-
-
+            - "33061:3306"
+        command: --init-file /data/application/init.sql
+        volumes:
+            - ./docker/init.sql:/data/application/init.sql
+            - database:/var/lib/mysql/
+        environment:
+            MYSQL_ROOT_USER: root
+            MYSQL_ROOT_PASSWORD: supersenha
+            MYSQL_DATABASE: mydb
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: supersenha
+        networks:
+          - api

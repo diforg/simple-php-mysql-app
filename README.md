@@ -18,3 +18,6 @@ docker exec -it ws-php8.1 /bin/bash
 
 composer install
 
+5. Rode as migrations
+
+php artisan migrate --seed
