@@ -1,30 +1,21 @@
-FROM ubuntu:latest
+FROM php:8.1-apache
 
 LABEL maintainer="diforg@gmail.com"
 LABEL description="PHP 8.1"
 
-# Fix debconf warnings upon build
-ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && apt-get install -y libzip-dev
 
 # Install selected extensions and other stuff
 RUN apt-get update \
-    && apt-get -y --no-install-recommends install \
-    php8.1 \
-    php8.1-zip \
-    php8.1-bcmath \
-    php8.1-gd \
-    php8.1-curl \
-    php8.1-xml \
-    php8.1-mbstring \
-    php8.1-pdo-firebird \
-    php8.1-mysql \
-    curl \
-    zip unzip \
-    mcrypt \
-    vim \
+    && docker-php-ext-install zip bcmath gd curl xml mbstring mysqli \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+ENV APACHE_DOCUMENT_ROOT /application/public
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 WORKDIR "/application"

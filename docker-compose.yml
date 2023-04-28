@@ -6,29 +6,18 @@ volumes:
     database:
         driver: local
 services:
-    nginx:
-        image: nginx:alpine
-        container_name: api-nginx
-        restart: unless-stopped
-        tty: true
-        working_dir: /application
-        volumes:
-            - ./src:/application
-            - ./docker/nginx.conf:/etc/nginx/conf.d
-        ports:
-            - "8080:80"
-        links:
-            - mysql            
-        networks:
-            - api
-    webserver:
-        image: diforg/ws-php8.1:1.0.4
-        container_name: ws-php8.1
+    api_php:
+        image: projeto19
+        container_name: api_php
         restart: unless-stopped
         tty: true
         working_dir: /application
         volumes:
           - ./src:/application
+        ports:
+            - "8080:80"
+        links:
+            - mysql  
         networks:
           - api
     mysql:
